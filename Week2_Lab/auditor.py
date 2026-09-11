@@ -29,7 +29,12 @@ def main ():
 
         #6 manage state
         total_inventory += stock_quantity
-        print(f"Added {stock_quantity} units. Current Total: {total_inventory}\n")
+        print(f"Added {stock_quantity} units. Current Total: {total_inventory}")
+
+        # 7. trigger overstock alert
+        if total_inventory > 500:
+            print(f"ALERT: Inventory capacity exceeded! Current Total: {total_inventory}\nStopping system automatically...")
+            break
 
 if __name__ == "__main__":
     main()
