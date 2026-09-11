@@ -27,5 +27,9 @@ def main ():
             print("Error: Stock quantity cannot be negative.")
             continue
 
+        #6 manage state
+        total_inventory += stock_quantity
+        print(f"Added {stock_quantity} units. Current Total: {total_inventory}\n")
+
 if __name__ == "__main__":
     main()
