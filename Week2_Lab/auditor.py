@@ -22,5 +22,10 @@ def main ():
         # 3. accept stock values as integers
         stock_quantity = int(usr_input)
 
+        #5 reject negative stock values
+        if stock_quantity < 0:
+            print("Error: Stock quantity cannot be negative.")
+            continue
+
 if __name__ == "__main__":
     main()
