@@ -17,6 +17,7 @@ def main ():
         # 4. handle invalid input
         if not usr_input.isdigit():
             print("Error: Invalid input. Please enter a whole number.")
+            failed_entries += 1
             continue
 
         # 3. accept stock values as integers
@@ -25,6 +26,7 @@ def main ():
         #5 reject negative stock values
         if stock_quantity < 0:
             print("Error: Stock quantity cannot be negative.")
+            failed_entries += 1
             continue
 
         #6 manage state
@@ -35,6 +37,14 @@ def main ():
         if total_inventory > 500:
             print(f"ALERT: Inventory capacity exceeded! Current Total: {total_inventory}\nStopping system automatically...")
             break
+
+# 8. final report
+    print("=" * 35)
+    print("AUDIT SUMMARY REPORT")
+    print("=" * 35)
+    print(f"Total Units Processed : {total_inventory}")
+    print(f"Failed/Rejected Entries: {failed_entries}")
+    print("=" * 35)
 
 if __name__ == "__main__":
     main()
