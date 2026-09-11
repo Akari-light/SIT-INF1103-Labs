@@ -13,7 +13,12 @@ def main ():
         # check for exit command 
         if usr_input.lower() == "quit":
             break
-        
+
+        # 4. handle invalid input
+        if not usr_input.isdigit():
+            print("Error: Invalid input. Please enter a whole number.")
+            continue
+
         # 3. accept stock values as integers
         stock_quantity = int(usr_input)
 
