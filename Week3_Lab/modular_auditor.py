@@ -38,8 +38,9 @@ def main ():
             continue
 
         #6 manage state
-        total_inventory += stock_quantity
-        print(f"Added {stock_quantity} units. Current Total: {total_inventory}")
+        total_inventory = process_delivery(total_inventory, stock_quantity)
+        tax = calculate_tax(stock_quantity)
+        print(f"Added {stock_quantity} units. Current Total: {total_inventory}.\nTax for this delivery: {tax:.2f}")
 
         # 7. trigger overstock alert
         if total_inventory > 500:
@@ -47,7 +48,7 @@ def main ():
             break
 
 # 8. final report
-    print("=" * 35)
+    print("\n" + "=" * 35)
     print("AUDIT SUMMARY REPORT")
     print("=" * 35)
     print(f"Total Units Processed : {total_inventory}")
