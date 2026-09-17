@@ -36,6 +36,7 @@ def main ():
     # 1. initialize variables
     total_inventory = 0
     failed_entries = 0
+    deliveries_processed = 0
 
     print("--- Smart Inventory Auditor ---")
     print("Type 'quit' to exit:\n")
@@ -55,6 +56,7 @@ def main ():
         #6 manage state
         total_inventory = process_delivery(total_inventory, stock_quantity)
         tax = calculate_tax(stock_quantity)
+        deliveries_processed += 1
         print(f"Added {stock_quantity} units. Current Total: {total_inventory}.\nTax for this delivery: {tax:.2f}")
 
         # 7. trigger overstock alert
@@ -63,6 +65,7 @@ def main ():
             break
 
     generate_report(total_inventory, failed_entries)
+    print(f"Total Deliveries Processed: {deliveries_processed}")
 
 if __name__ == "__main__":
     main()
