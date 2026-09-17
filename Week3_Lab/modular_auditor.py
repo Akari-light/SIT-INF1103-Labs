@@ -6,6 +6,23 @@ def process_delivery(current_total, new_value):
 def calculate_tax(amount):
     return amount * 0.10
 
+# Handles the prompt, handles input validation, and returns a valid integer or a "quit" signal
+def get_valid_input():
+    usr_input = input("Enter stock quantity: ").strip()
+
+    if usr_input.lower() == "quit":
+        return "quit"
+
+    try:
+        stock_quantity = int(usr_input)
+    except ValueError:
+        raise ValueError("Invalid input. Please enter a whole number.")
+
+    if stock_quantity < 0:
+        raise ValueError("Stock quantity cannot be negative.")
+
+    return stock_quantity
+
 def main ():
     # 1. initialize variables
     total_inventory = 0
@@ -16,26 +33,15 @@ def main ():
 
     # 2. continuous loop
     while True:
-        usr_input = input("Enter stock quantity: ")
+        try:
+            stock_quantity = get_valid_input()
+        except ValueError as error:
+            print(f"Error: {error}")
+            failed_entries += 1
+            continue
 
-        # check for exit command 
-        if usr_input.lower() == "quit":
+        if stock_quantity == "quit":
             break
-
-        # 4. handle invalid input
-        if not usr_input.isdigit():
-            print("Error: Invalid input. Please enter a whole number.")
-            failed_entries += 1
-            continue
-
-        # 3. accept stock values as integers
-        stock_quantity = int(usr_input)
-
-        #5 reject negative stock values
-        if stock_quantity < 0:
-            print("Error: Stock quantity cannot be negative.")
-            failed_entries += 1
-            continue
 
         #6 manage state
         total_inventory = process_delivery(total_inventory, stock_quantity)
