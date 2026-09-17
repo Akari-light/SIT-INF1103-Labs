@@ -23,6 +23,15 @@ def get_valid_input():
 
     return stock_quantity
 
+# A dedicated function to print the final summary
+def generate_report(total_inventory, failed_attempts):
+    print("\n" + "=" * 35)
+    print("AUDIT SUMMARY REPORT")
+    print("=" * 35)
+    print(f"Total Units Processed  : {total_inventory}")
+    print(f"Failed/Rejected Entries: {failed_attempts}")
+    print("=" * 35)
+
 def main ():
     # 1. initialize variables
     total_inventory = 0
@@ -53,13 +62,7 @@ def main ():
             print(f"ALERT: Inventory capacity exceeded! Current Total: {total_inventory}\nStopping system automatically...")
             break
 
-# 8. final report
-    print("\n" + "=" * 35)
-    print("AUDIT SUMMARY REPORT")
-    print("=" * 35)
-    print(f"Total Units Processed : {total_inventory}")
-    print(f"Failed/Rejected Entries: {failed_entries}")
-    print("=" * 35)
+    generate_report(total_inventory, failed_entries)
 
 if __name__ == "__main__":
     main()
