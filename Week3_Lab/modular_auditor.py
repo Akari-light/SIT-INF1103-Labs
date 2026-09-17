@@ -1,3 +1,11 @@
+# Calculates the new total and returns it.
+def process_delivery(current_total, new_value):
+    return current_total + new_value
+
+# takes a delivery amount and returns the tax (10% of that specific delivery).
+def calculate_tax(amount):
+    return amount * 0.10
+
 def main ():
     # 1. initialize variables
     total_inventory = 0
