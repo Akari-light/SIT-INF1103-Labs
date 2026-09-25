@@ -1,19 +1,16 @@
+import json
+
 INVENTORY_FILE = "inventory.txt"
 
 # 1. Persistence
 def load_inventory():
     try:
         with open(INVENTORY_FILE, "r", encoding="utf-8") as file:
-            lines = [line.strip() for line in file if line.strip()]
+            data = json.load(file)
     except FileNotFoundError:
         return 0, []
 
-    if not lines:
-        return 0, []
-
-    total = int(lines[0])
-    history = [int(line) for line in lines[1:]]
-    return total, history
+    return data["total_inventory"], data["transaction_history"]
 
 # Calculates the new total and returns it.
 def process_delivery(current_total, new_value):
@@ -72,6 +69,7 @@ def main ():
 
         # manage state
         total_inventory = process_delivery(total_inventory, stock_quantity)
+        history.append(stock_quantity)
         tax = calculate_tax(stock_quantity)
         deliveries_processed += 1
         print(f"Added {stock_quantity} units. Current Total: {total_inventory}.\nTax for this delivery: {tax:.2f}")
