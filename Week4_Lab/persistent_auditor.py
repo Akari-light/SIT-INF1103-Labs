@@ -1,3 +1,20 @@
+INVENTORY_FILE = "inventory.txt"
+
+# 1. Persistence
+def load_inventory():
+    try:
+        with open(INVENTORY_FILE, "r", encoding="utf-8") as file:
+            lines = [line.strip() for line in file if line.strip()]
+    except FileNotFoundError:
+        return 0, []
+
+    if not lines:
+        return 0, []
+
+    total = int(lines[0])
+    history = [int(line) for line in lines[1:]]
+    return total, history
+
 # Calculates the new total and returns it.
 def process_delivery(current_total, new_value):
     return current_total + new_value
@@ -33,15 +50,15 @@ def generate_report(total_inventory, failed_attempts):
     print("=" * 35)
 
 def main ():
-    # 1. initialize variables
-    total_inventory = 0
+    # initialize variables
+    total_inventory, history = load_inventory()
     failed_entries = 0
     deliveries_processed = 0
 
     print("--- Smart Inventory Auditor ---")
     print("Type 'quit' to exit:\n")
 
-    # 2. continuous loop
+    # continuous loop
     while True:
         try:
             stock_quantity = get_valid_input()
@@ -53,13 +70,13 @@ def main ():
         if stock_quantity == "quit":
             break
 
-        #6 manage state
+        # manage state
         total_inventory = process_delivery(total_inventory, stock_quantity)
         tax = calculate_tax(stock_quantity)
         deliveries_processed += 1
         print(f"Added {stock_quantity} units. Current Total: {total_inventory}.\nTax for this delivery: {tax:.2f}")
 
-        # 7. trigger overstock alert
+        # trigger overstock alert
         if total_inventory > 500:
             print(f"ALERT: Inventory capacity exceeded! Current Total: {total_inventory}\nStopping system automatically...")
             break
