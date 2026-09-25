@@ -1,24 +1,27 @@
 import json
+from pathlib import Path
 
-INVENTORY_FILE = "inventory.txt"
+INVENTORY_FILE = Path(__file__).with_name("inventory.txt")
 
 # 1. Persistence
 def load_inventory():
     try:
-        with open(INVENTORY_FILE, "r", encoding="utf-8") as file:
+        with INVENTORY_FILE.open("r", encoding="utf-8") as file:
             data = json.load(file)
     except FileNotFoundError:
-        return 0, []
+        return 0, [], []
 
-    return data["total_inventory"], data["transaction_history"]
+    return data["total_inventory"], data["transaction_history"], data.get("orders", [])
+
 # 3. Write-back
-def save_inventory(total, history):
+def save_inventory(total, history, orders):
     data = {
         "total_inventory": total,
-        "transaction_history": history
+        "transaction_history": history,
+        "orders": orders,
     }
 
-    with open(INVENTORY_FILE, "w", encoding="utf-8") as file:
+    with INVENTORY_FILE.open("w", encoding="utf-8") as file:
         json.dump(data, file, indent=2)
         file.write("\n")
 
@@ -32,64 +35,97 @@ def calculate_tax(amount):
 
 # Handles the prompt, handles input validation, and returns a valid integer or a "quit" signal
 def get_valid_input():
-    usr_input = input("Enter stock quantity: ").strip()
+    product_name = input("Enter Product Name (or 'quit'): ").strip()
+    if product_name.lower() == "quit":
+        return "quit"
+    if not product_name:
+        raise ValueError("Product name cannot be empty.")
 
-    if usr_input.lower() == "quit":
+    quantity_input = input("Enter Quantity: ").strip()
+    if quantity_input.lower() == "quit":
         return "quit"
 
     try:
-        stock_quantity = int(usr_input)
+        quantity = int(quantity_input)
     except ValueError:
         raise ValueError("Invalid input. Please enter a whole number.")
 
-    if stock_quantity < 0:
+    if quantity < 0:
         raise ValueError("Stock quantity cannot be negative.")
 
-    return stock_quantity
+    return product_name, quantity
+
+
+def format_order(order):
+    return f'{order["id"]}, {order["product_name"]}, {order["quantity"]}'
+
+
+def show_current_orders(orders):
+    print("Current Orders:")
+    if orders:
+        for order in orders:
+            print(format_order(order))
+    else:
+        print("(none)")
+    print()
 
 # A dedicated function to print the final summary
 def generate_report(total_inventory, failed_attempts):
     print("\n" + "=" * 35)
     print("AUDIT SUMMARY REPORT")
     print("=" * 35)
-    print(f"Total Units Processed  : {total_inventory}")
+    print(f"Total Units in Inventory: {total_inventory}")
     print(f"Failed/Rejected Entries: {failed_attempts}")
     print("=" * 35)
 
-def main ():
+def main():
     # initialize variables
-    total_inventory, history = load_inventory()
+    total_inventory, history, orders = load_inventory()
     failed_entries = 0
     deliveries_processed = 0
+    next_order_id = max((order["id"] for order in orders), default=1000) + 1
 
     print("--- Smart Inventory Auditor ---")
     print("Type 'quit' to exit:\n")
+    show_current_orders(orders)
 
     # continuous loop
     while True:
         try:
-            stock_quantity = get_valid_input()
+            entry = get_valid_input()
         except ValueError as error:
-            print(f"Error: {error}")
+            print(f"Error: {error}\n")
             failed_entries += 1
             continue
 
-        if stock_quantity == "quit":
+        if entry == "quit":
             break
 
         # manage state
-        total_inventory = process_delivery(total_inventory, stock_quantity)
-        history.append(stock_quantity)
-        tax = calculate_tax(stock_quantity)
+        product_name, quantity = entry
+        order = {
+            "id": next_order_id,
+            "product_name": product_name,
+            "quantity": quantity,
+        }
+        orders.append(order)
+        next_order_id += 1
+        total_inventory = process_delivery(total_inventory, quantity)
+        history.append(quantity)
         deliveries_processed += 1
-        print(f"Added {stock_quantity} units. Current Total: {total_inventory}.\nTax for this delivery: {tax:.2f}")
+
+        print("\nNew Order Added:")
+        print(format_order(order))
+        print(f"Current Total: {total_inventory}")
+        print(f"Tax for this delivery: {calculate_tax(quantity):.2f}\n")
 
         # trigger overstock alert
         if total_inventory > 500:
             print(f"ALERT: Inventory capacity exceeded! Current Total: {total_inventory}\nStopping system automatically...")
             break
 
-    save_inventory(total_inventory, history)
+    save_inventory(total_inventory, history, orders)
+    print(f"Inventory successfully saved to {INVENTORY_FILE.name}")
     generate_report(total_inventory, failed_entries)
     print(f"Transaction History: {history}")
     print(f"Total Deliveries Processed: {deliveries_processed}")
