@@ -80,6 +80,7 @@ def main ():
             break
 
     generate_report(total_inventory, failed_entries)
+    print(f"Transaction History: {history}")
     print(f"Total Deliveries Processed: {deliveries_processed}")
 
 if __name__ == "__main__":
