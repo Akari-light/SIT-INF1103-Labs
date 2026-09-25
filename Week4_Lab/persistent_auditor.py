@@ -11,6 +11,16 @@ def load_inventory():
         return 0, []
 
     return data["total_inventory"], data["transaction_history"]
+# 3. Write-back
+def save_inventory(total, history):
+    data = {
+        "total_inventory": total,
+        "transaction_history": history
+    }
+
+    with open(INVENTORY_FILE, "w", encoding="utf-8") as file:
+        json.dump(data, file, indent=2)
+        file.write("\n")
 
 # Calculates the new total and returns it.
 def process_delivery(current_total, new_value):
@@ -79,6 +89,7 @@ def main ():
             print(f"ALERT: Inventory capacity exceeded! Current Total: {total_inventory}\nStopping system automatically...")
             break
 
+    save_inventory(total_inventory, history)
     generate_report(total_inventory, failed_entries)
     print(f"Transaction History: {history}")
     print(f"Total Deliveries Processed: {deliveries_processed}")
