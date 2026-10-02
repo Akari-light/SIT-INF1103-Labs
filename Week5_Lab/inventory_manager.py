@@ -111,13 +111,42 @@ def search_product(inventory):
             return
     print("Product not found.")
 
+def save_inventory(inventory):
+    with INVENTORY_FILE.open("w", encoding="utf-8") as file:
+        json.dump(inventory, file, indent=4)
+
+    print("Inventory saved successfully.")
+
 def main():
     inventory = load_inventory()
 
-    add_product(inventory)
-    update_stock(inventory)
-    search_product(inventory)
-    display_all(inventory)
+    while True:
+        print("\n1. Display All Products")
+        print("2. Add Product")
+        print("3. Update Stock")
+        print("4. Search Product")
+        print("5. Save Inventory")
+        print("6. Exit")
+
+        choice = input("Enter option: ").strip()
+
+        if choice == "1":
+            display_all(inventory)
+        elif choice == "2":
+            add_product(inventory)
+        elif choice == "3":
+            update_stock(inventory)
+        elif choice == "4":
+            search_product(inventory)
+        elif choice == "5":
+            save_inventory(inventory)
+        elif choice == "6":
+            save_inventory(inventory)
+            print("Thank you for using Inventory Management System.")
+            break
+        else:
+            print("Invalid option. Please choose 1 to 6.")
+
 
 if __name__ == "__main__":
     main()
