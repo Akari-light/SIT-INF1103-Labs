@@ -1,0 +1,29 @@
+﻿commit 07603fbb7d217d77e4ec20683b57883fc7715d7c
+Author: 2605736 <2605736@sit.singaporetech.edu.sg >
+Date:   Fri Sep 4 16:49:15 2026 +0800
+
+    Add conditional logic and integer type casting to profile creator
+
+commit 3e9088bc313bf61bb3a4f056314980baf385d037
+Author: 2605736 <2605736@sit.singaporetech.edu.sg >
+Date:   Fri Sep 4 16:44:16 2026 +0800
+
+    Make profile creator interactive using user input
+
+commit 806d402e4c2a3c7e7cd49266069ca9313bd8a704
+Author: 2605736 <2605736@sit.singaporetech.edu.sg >
+Date:   Fri Sep 4 16:38:43 2026 +0800
+
+    Add follower growth tracking logic
+
+commit 9e5f0caaf2b0de9d2fbe92c4084f197c9ec2bf03
+Author: 2605736 <2605736@sit.singaporetech.edu.sg >
+Date:   Fri Sep 4 16:34:18 2026 +0800
+
+    Update profile information with username, bio, and followers
+
+commit 0c94b0fbc0f470264609cb470f4b982b5a7c17e7
+Author: 2605736 <2605736@sit.singaporetech.edu.sg >
+Date:   Fri Sep 4 16:26:13 2026 +0800
+
+    First Post
