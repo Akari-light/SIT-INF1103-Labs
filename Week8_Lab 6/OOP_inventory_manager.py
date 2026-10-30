@@ -10,6 +10,14 @@ class Product:
         self.__price = price
         self.__stock = stock
 
+    def display_information(self):
+        print(
+            f"ID: {self.__product_id} | "
+            f"Name: {self.__name} | "
+            f"Price: ${self.__price:.2f} | "
+            f"Stock: {self.__stock}"
+        )
+
 def load_inventory():
     if not INVENTORY_FILE.exists():
         print("inventory.json not found. Starting with empty inventory.")
