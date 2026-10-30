@@ -8,7 +8,7 @@ class Product:
         self.__product_id = product_id
         self.__name = name
         self.__price = price
-        self.update_stock(stock)
+        self.set_stock(stock)
 
     def display_information(self):
         print(
@@ -18,11 +18,48 @@ class Product:
             f"Stock: {self.__stock}"
         )
 
-    def update_stock(self, quantity):
+    def set_stock(self, quantity):
         if quantity < 0:
             raise ValueError("Stock cannot be negative.")
 
         self.__stock = quantity
+
+    def get_product_id(self):
+        return self.__product_id
+
+class Inventory:
+    def __init__(self):
+        self.__products = []
+
+    def display_all(self):
+        print("\nCurrent Inventory")
+        print("-" * 48)
+
+        if not self.__products:
+            print("Inventory is empty.")
+        else:
+            for product in self.__products:
+                product.display_information()
+
+        print("-" * 48)
+
+    def search_product(self, product_id):
+        for product in self.__products:
+            if product.get_product_id() == product_id:
+                return product
+
+        return None
+
+    def add_product(self, product):
+        product_id = product.get_product_id()
+
+        if self.search_product(product_id) is not None:
+            raise ValueError("Product ID already exists.")
+
+        self.__products.append(product)    
+
+
+##################
 
 def load_inventory():
     if not INVENTORY_FILE.exists():
