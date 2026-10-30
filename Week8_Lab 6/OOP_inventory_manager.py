@@ -140,28 +140,28 @@ def update_stock(inventory):
     print("\nUpdate Stock")
     product_id = input("Enter Product ID: ").strip()
 
-    for product in inventory:
-        if product["id"] == product_id:
-            print("\nProduct Found:")
-            print(f"Name: {product['name']}")
-            print(f"Current Stock: {product['stock']}")
+    product = inventory.search_product(product_id)
 
-            try:
-                new_stock = int(input("\nNew Stock Quantity: "))
-            except ValueError:
-                print("\nStock must be a whole number.")
-                return inventory
+    if product is None:
+        print("\nProduct not found.")
+        return
 
-            if new_stock < 0:
-                print("\nStock cannot be negative.")
-                return inventory
+    print("\nProduct Found:")
+    product.display_information()
 
-            product["stock"] = new_stock
-            print("\nStock updated successfully!")
-            return inventory
+    try:
+        new_stock = int(input("\nNew Stock Quantity: "))
+    except ValueError:
+        print("\nStock must be a whole number.")
+        return
 
-    print("\nProduct not found.")
-    return inventory
+    try:
+        product.set_stock(new_stock)
+    except ValueError as error:
+        print(f"\n{error}")
+        return
+
+    print("\nStock updated successfully!")
 
 
 def main():
