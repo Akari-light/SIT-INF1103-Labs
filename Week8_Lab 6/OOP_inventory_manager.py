@@ -27,7 +27,7 @@ class Product:
     def get_product_id(self):
         return self.__product_id
 
-    def create_dict(self):
+    def create_product_dict(self):
         return {
             "id": self.__product_id,
             "name": self.__name,
@@ -66,7 +66,21 @@ class Inventory:
 
         self.__products.append(product)    
 
+    def create_product_list(self):
+        products_data = []
 
+        for product in self.__products:
+            products_data.append(product.create_product_dict())
+
+        return products_data   
+
+
+def save_inventory(inventory):
+    inventory_data = inventory.create_product_list()
+
+    with INVENTORY_FILE.open("w", encoding="utf-8") as file:
+        json.dump(inventory_data, file, indent=4)
+        
 ##################
 
 def load_inventory():
@@ -182,12 +196,6 @@ def search_product(inventory):
             return
 
     print("\nProduct not found.")
-
-
-def save_inventory(inventory):
-    with INVENTORY_FILE.open("w", encoding="utf-8") as file:
-        json.dump(inventory, file, indent=4)
-
 
 def main():
     print("=" * 40)
