@@ -3,6 +3,12 @@ from pathlib import Path
 
 INVENTORY_FILE = Path(__file__).resolve().parent / "inventory.json"
 
+class Product:
+    def __init__(self, product_id, name, price, stock):
+        self.__product_id = product_id
+        self.__name = name
+        self.__price = price
+        self.__stock = stock
 
 def load_inventory():
     if not INVENTORY_FILE.exists():
