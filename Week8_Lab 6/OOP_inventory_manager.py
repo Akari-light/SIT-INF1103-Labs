@@ -27,6 +27,14 @@ class Product:
     def get_product_id(self):
         return self.__product_id
 
+    def create_dict(self):
+        return {
+            "id": self.__product_id,
+            "name": self.__name,
+            "price": self.__price,
+            "stock": self.__stock
+        }    
+
 class Inventory:
     def __init__(self):
         self.__products = []
