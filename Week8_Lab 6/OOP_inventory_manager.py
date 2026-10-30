@@ -80,21 +80,31 @@ def save_inventory(inventory):
 
     with INVENTORY_FILE.open("w", encoding="utf-8") as file:
         json.dump(inventory_data, file, indent=4)
-        
-##################
 
 def load_inventory():
+    inventory = Inventory()
+
     if not INVENTORY_FILE.exists():
         print("inventory.json not found. Starting with empty inventory.")
-        return []
-
-    print("inventory.json found.")
+        return inventory
 
     with INVENTORY_FILE.open("r", encoding="utf-8") as file:
-        inventory = json.load(file)
+        inventory_data = json.load(file)
+
+    for product_data in inventory_data:
+        product = Product(
+            product_data["id"],
+            product_data["name"],
+            product_data["price"],
+            product_data["stock"]
+        )
+        inventory.add_product(product)
 
     print("Inventory loaded successfully.")
     return inventory
+
+##################
+
 
 
 def display_all(inventory):
