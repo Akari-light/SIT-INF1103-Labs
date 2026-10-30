@@ -8,7 +8,7 @@ class Product:
         self.__product_id = product_id
         self.__name = name
         self.__price = price
-        self.__stock = stock
+        self.update_stock(stock)
 
     def display_information(self):
         print(
