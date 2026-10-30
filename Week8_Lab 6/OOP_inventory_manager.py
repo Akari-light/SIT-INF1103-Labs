@@ -1,4 +1,3 @@
-from itertools import product
 import json
 from pathlib import Path
 
@@ -110,11 +109,6 @@ def add_product(inventory):
         print("\nProduct ID and name cannot be empty.")
         return inventory
 
-    for product in inventory:
-        if product["id"] == product_id:
-            print("\nProduct ID already exists.")
-            return inventory
-
     try:
         product_price = float(input("Price: "))
         product_stock = int(input("Stock Quantity: "))
@@ -126,14 +120,18 @@ def add_product(inventory):
         print("\nPrice and stock cannot be negative.")
         return inventory
 
-    new_product = {
-        "id": product_id,
-        "name": product_name,
-        "price": product_price,
-        "stock": product_stock
-    }
+    try:
+        new_product = Product(
+            product_id,
+            product_name,
+            product_price,
+            product_stock
+        )
+        inventory.add_product(new_product)
+    except ValueError as error:
+        print(f"\n{error}")
+        return inventory
 
-    inventory.append(new_product)
     print("\nProduct added successfully!")
     return inventory
 
