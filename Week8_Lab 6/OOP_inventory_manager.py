@@ -1,3 +1,4 @@
+from itertools import product
 import json
 from pathlib import Path
 
@@ -11,12 +12,7 @@ class Product:
         self.set_stock(stock)
 
     def display_information(self):
-        print(
-            f"ID: {self.__product_id} | "
-            f"Name: {self.__name} | "
-            f"Price: ${self.__price:.2f} | "
-            f"Stock: {self.__stock}"
-        )
+        print( f"ID: {self.__product_id} | Name: {self.__name} | Price: ${self.__price:.2f} | Stock: {self.__stock}")
 
     def set_stock(self, quantity):
         if quantity < 0:
@@ -105,26 +101,6 @@ def load_inventory():
 
 ##################
 
-
-
-def display_all(inventory):
-    print("\nCurrent Inventory")
-    print("-" * 48)
-
-    if not inventory:
-        print("Inventory is empty.")
-    else:
-        for product in inventory:
-            print(
-                f"ID: {product['id']} | "
-                f"Name: {product['name']} | "
-                f"Price: ${product['price']:.2f} | "
-                f"Stock: {product['stock']}"
-            )
-
-    print("-" * 48)
-
-
 def add_product(inventory):
     print("\nAdd New Product")
     product_id = input("Product ID: ").strip()
@@ -190,23 +166,6 @@ def update_stock(inventory):
     return inventory
 
 
-def search_product(inventory):
-    print("\nSearch Product")
-    product_id = input("Enter Product ID: ").strip()
-
-    for product in inventory:
-        if product["id"] == product_id:
-            print("\nProduct Found")
-            print("-" * 48)
-            print(f"ID: {product['id']}")
-            print(f"Name: {product['name']}")
-            print(f"Price: ${product['price']:.2f}")
-            print(f"Stock: {product['stock']}")
-            print("-" * 48)
-            return
-
-    print("\nProduct not found.")
-
 def main():
     print("=" * 40)
     print("INVENTORY MANAGEMENT SYSTEM")
@@ -228,7 +187,7 @@ def main():
         choice = input("\nEnter option: ").strip()
 
         if choice == "1":
-            display_all(inventory)
+            inventory.display_all()
 
         elif choice == "2":
             add_product(inventory)
@@ -237,7 +196,16 @@ def main():
             update_stock(inventory)
 
         elif choice == "4":
-            search_product(inventory)
+            product_id = input("Enter Product ID: ").strip()
+            product = inventory.search_product(product_id)
+
+            if product is None:
+                print("\nProduct not found.")
+            else:
+                print("-" * 48)
+                print("Product Found: ", end="")
+                product.display_information()
+                print("-" * 48)
 
         elif choice == "5":
             print("\nSaving inventory...")
