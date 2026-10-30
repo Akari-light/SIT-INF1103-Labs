@@ -18,6 +18,12 @@ class Product:
             f"Stock: {self.__stock}"
         )
 
+    def update_stock(self, quantity):
+        if quantity < 0:
+            raise ValueError("Stock cannot be negative.")
+
+        self.__stock = quantity
+
 def load_inventory():
     if not INVENTORY_FILE.exists():
         print("inventory.json not found. Starting with empty inventory.")
