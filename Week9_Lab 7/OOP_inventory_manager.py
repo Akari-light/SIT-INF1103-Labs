@@ -24,6 +24,14 @@ class Product(ABC):
     def get_fulfilment_info(self):
         pass
 
+    def display_information(self):
+        print(
+            f"ID: {self.__product_id} | "
+            f"Name: {self.__name} | "
+            f"Price: ${self.__price:.2f} | "
+            f"Stock: {self.__stock}"
+        )
+
     def create_product_dict(self):
         return {
             "id": self.__product_id,
