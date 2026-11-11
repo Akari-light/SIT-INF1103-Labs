@@ -40,6 +40,12 @@ class Product(ABC):
             "stock": self.__stock
         }    
 
+class CanBeShipped(ABC):
+    @abstractmethod
+    def calculate_shipping_cost(self):
+        pass
+
+@CanBeShipped.register
 class PhysicalProduct(Product):
     def __init__(self, product_id, name, price, stock, weight):
         super().__init__(product_id, name, price, stock)
@@ -47,6 +53,9 @@ class PhysicalProduct(Product):
     
     def get_fulfilment_info(self):
         return "This product requires physical shipping."
+
+    def calculate_shipping_cost(self):
+        return 5.00 + 2.00 * self.__weight
     
     def display_information(self):
         super().display_information()
