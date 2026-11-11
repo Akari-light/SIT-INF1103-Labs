@@ -63,6 +63,7 @@ class PhysicalProduct(Product):
 
     def create_product_dict(self):
         product_dict = super().create_product_dict()
+        product_dict["type"] = "physical"
         product_dict["weight"] = self.__weight
         return product_dict
 
@@ -80,6 +81,7 @@ class DigitalProduct(Product):
 
     def create_product_dict(self):
         product_dict = super().create_product_dict()
+        product_dict["type"] = "digital"
         product_dict["download_size"] = self.__download_size
         return product_dict
 
@@ -140,12 +142,22 @@ def load_inventory():
         inventory_data = json.load(file)
 
     for product_data in inventory_data:
-        product = Product(
+        product_type = product_data.get("type")
+
+        common_args = (
             product_data["id"],
             product_data["name"],
             product_data["price"],
             product_data["stock"]
         )
+
+        if product_type == "physical":
+            product = PhysicalProduct(*common_args, product_data["weight"])
+        elif product_type == "digital":
+            product = DigitalProduct(*common_args, product_data["download_size"])
+        else:
+            raise ValueError(f"Missing or unsupported product type: {product_type!r}")
+
         inventory.add_product(product)
 
     print("Inventory loaded successfully.")
