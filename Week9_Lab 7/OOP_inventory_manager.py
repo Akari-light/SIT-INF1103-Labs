@@ -1,17 +1,15 @@
 import json
 from pathlib import Path
+from abc import ABC, abstractmethod
 
 INVENTORY_FILE = Path(__file__).resolve().parent / "inventory.json"
 
-class Product:
+class Product(ABC):
     def __init__(self, product_id, name, price, stock):
         self.__product_id = product_id
         self.__name = name
         self.__price = price
         self.set_stock(stock)
-
-    def display_information(self):
-        print( f"ID: {self.__product_id} | Name: {self.__name} | Price: ${self.__price:.2f} | Stock: {self.__stock}")
 
     def set_stock(self, quantity):
         if quantity < 0:
@@ -21,6 +19,10 @@ class Product:
 
     def get_product_id(self):
         return self.__product_id
+
+    @abstractmethod
+    def get_fulfilment_info(self):
+        pass
 
     def create_product_dict(self):
         return {
@@ -34,7 +36,10 @@ class PhysicalProduct(Product):
     def __init__(self, product_id, name, price, stock, weight):
         super().__init__(product_id, name, price, stock)
         self.__weight = weight
-
+    
+    def get_fulfilment_info(self):
+        return "This product requires physical shipping."
+    
     def display_information(self):
         super().display_information()
         print(f"Weight: {self.__weight} kg")
@@ -48,6 +53,9 @@ class DigitalProduct(Product):
     def __init__(self, product_id, name, price, stock, download_size):
         super().__init__(product_id, name, price, stock)
         self.__download_size = download_size
+
+    def get_fulfilment_info(self):
+        return "This product is delivered digitally."
 
     def display_information(self):
         super().display_information()
