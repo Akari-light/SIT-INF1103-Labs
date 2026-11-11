@@ -30,6 +30,20 @@ class Product:
             "stock": self.__stock
         }    
 
+class PhysicalProduct(Product):
+    def __init__(self, product_id, name, price, stock, weight):
+        super().__init__(product_id, name, price, stock)
+        self.__weight = weight
+
+    def display_information(self):
+        super().display_information()
+        print(f"Weight: {self.__weight} kg")
+
+    def create_product_dict(self):
+        product_dict = super().create_product_dict()
+        product_dict["weight"] = self.__weight
+        return product_dict
+
 class Inventory:
     def __init__(self):
         self.__products = []
