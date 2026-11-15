@@ -18,11 +18,15 @@ class Supplier:
         )
 
 class Product(ABC):
-    def __init__(self, product_id, name, price, stock):
+    def __init__(
+        self, product_id: str, name: str, price: float, stock: int,
+        supplier: Supplier
+    ) -> None:
         self.__product_id = product_id
         self.__name = name
         self.__price = price
         self.set_stock(stock)
+        self.supplier: Supplier = supplier
 
     def set_stock(self, quantity):
         if quantity < 0:
@@ -60,9 +64,13 @@ class CanBeShipped(ABC):
 
 @CanBeShipped.register
 class PhysicalProduct(Product):
-    def __init__(self, product_id, name, price, stock, weight):
-        super().__init__(product_id, name, price, stock)
+    def __init__(
+        self, product_id: str, name: str, price: float, stock: int,
+        weight: float, supplier: Supplier
+    ) -> None:
+        super().__init__(product_id, name, price, stock, supplier)
         self.__weight = weight
+        
     
     def get_fulfilment_info(self):
         return "This product requires physical shipping."
@@ -81,8 +89,11 @@ class PhysicalProduct(Product):
         return product_dict
 
 class DigitalProduct(Product):
-    def __init__(self, product_id, name, price, stock, download_size):
-        super().__init__(product_id, name, price, stock)
+    def __init__(
+        self, product_id: str, name: str, price: float, stock: int,
+        download_size: float, supplier: Supplier
+    ) -> None:
+        super().__init__(product_id, name, price, stock, supplier)
         self.__download_size = download_size
 
     def get_fulfilment_info(self):
