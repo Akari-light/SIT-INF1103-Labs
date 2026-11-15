@@ -1,0 +1,28 @@
+[
+    {
+        "id": "P002",
+        "name": "Mouse",
+        "price": 25.5,
+        "stock": 40,
+        "supplier": {
+            "id": "S001",
+            "name": "Tech Supply",
+            "contact_email": "sales@example.com"
+        },
+        "type": "physical",
+        "weight": 0.5
+    },
+    {
+        "id": "D001",
+        "name": "Photo Editor",
+        "price": 49.99,
+        "stock": 10,
+        "supplier": {
+            "id": "S001",
+            "name": "Tech Supply",
+            "contact_email": "sales@example.com"
+        },
+        "type": "digital",
+        "download_size": 350
+    }
+]
