@@ -28,23 +28,23 @@ class Product(ABC):
         self.set_stock(stock)
         self.supplier: Supplier = supplier
 
-    def set_stock(self, quantity):
+    def set_stock(self, quantity: int) -> None:
         if quantity < 0:
             raise ValueError("Stock cannot be negative.")
 
         self.__stock = quantity
 
-    def get_product_id(self):
+    def get_product_id(self) -> str:
         return self.__product_id
 
     def get_price(self) -> float:
         return self.__price
 
     @abstractmethod
-    def get_fulfilment_info(self):
+    def get_fulfilment_info(self) -> str:
         pass
 
-    def display_information(self):
+    def display_information(self) -> None:
         print(
             f"ID: {self.__product_id} | "
             f"Name: {self.__name} | "
@@ -62,7 +62,7 @@ class Product(ABC):
 
 class CanBeShipped(ABC):
     @abstractmethod
-    def calculate_shipping_cost(self):
+    def calculate_shipping_cost(self) -> float:
         pass
 
 @CanBeShipped.register
@@ -75,13 +75,13 @@ class PhysicalProduct(Product):
         self.__weight = weight
         
     
-    def get_fulfilment_info(self):
+    def get_fulfilment_info(self) -> str:
         return "This product requires physical shipping."
 
-    def calculate_shipping_cost(self):
+    def calculate_shipping_cost(self) -> float:
         return 5.00 + 2.00 * self.__weight
     
-    def display_information(self):
+    def display_information(self) -> None:
         super().display_information()
         print(f"Weight: {self.__weight} kg")
 
@@ -99,10 +99,10 @@ class DigitalProduct(Product):
         super().__init__(product_id, name, price, stock, supplier)
         self.__download_size = download_size
 
-    def get_fulfilment_info(self):
+    def get_fulfilment_info(self) -> str:
         return "This product is delivered digitally."
 
-    def display_information(self):
+    def display_information(self) -> None:
         super().display_information()
         print(f"Download Size: {self.__download_size} MB")
 
