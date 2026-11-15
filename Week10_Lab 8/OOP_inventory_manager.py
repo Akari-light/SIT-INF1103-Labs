@@ -57,7 +57,12 @@ class Product(ABC):
             "id": self.__product_id,
             "name": self.__name,
             "price": self.__price,
-            "stock": self.__stock
+            "stock": self.__stock,
+            "supplier": {
+                "id": self.supplier.supplier_id,
+                "name": self.supplier.name,
+                "contact_email": self.supplier.contact_email,
+            },            
         }    
 
 class CanBeShipped(ABC):
@@ -212,10 +217,17 @@ def load_inventory():
             product_data["stock"]
         )
 
+        supplier_data = product_data["supplier"]
+        supplier = Supplier(
+            supplier_data["id"],
+            supplier_data["name"],
+            supplier_data["contact_email"],
+        )
+
         if product_type == "physical":
-            product = PhysicalProduct(*common_args, product_data["weight"])
+            product = PhysicalProduct(*common_args, product_data["weight"], supplier)
         elif product_type == "digital":
-            product = DigitalProduct(*common_args, product_data["download_size"])
+            product = DigitalProduct(*common_args, product_data["download_size"], supplier)
         else:
             raise ValueError(f"Missing or unsupported product type: {product_type!r}")
 
