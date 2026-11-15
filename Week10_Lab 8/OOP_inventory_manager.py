@@ -111,7 +111,7 @@ class DigitalProduct(Product):
 
 class Inventory:
     def __init__(self):
-        self.__products = []
+        self.__products: list[Product] = []
 
     def display_all(self):
         print("\nCurrent Inventory")
@@ -125,20 +125,29 @@ class Inventory:
 
         print("-" * 48)
 
-    def search_product(self, product_id):
+    def search_product(self, product_id: str) -> Product | None:
         for product in self.__products:
             if product.get_product_id() == product_id:
                 return product
 
         return None
 
-    def add_product(self, product):
+    def add_product(self, product: Product) -> None:
         product_id = product.get_product_id()
 
         if self.search_product(product_id) is not None:
             raise ValueError("Product ID already exists.")
 
         self.__products.append(product)    
+
+    def remove_product(self, product_id: str) -> Product | None:
+        product = self.search_product(product_id)
+
+        if product is None:
+            return None
+
+        self.__products.remove(product)
+        return product
 
     def create_product_list(self):
         products_data = []
