@@ -37,6 +37,9 @@ class Product(ABC):
     def get_product_id(self):
         return self.__product_id
 
+    def get_price(self) -> float:
+        return self.__price
+
     @abstractmethod
     def get_fulfilment_info(self):
         pass
@@ -157,6 +160,13 @@ class Inventory:
 
         return products_data   
 
+class OrderLine:
+    def __init__(self, product: Product, quantity: int) -> None:
+        self.product = product
+        self.quantity = quantity
+
+    def calculate_subtotal(self) -> float:
+        return self.product.get_price() * self.quantity
 
 def save_inventory(inventory):
     inventory_data = inventory.create_product_list()
