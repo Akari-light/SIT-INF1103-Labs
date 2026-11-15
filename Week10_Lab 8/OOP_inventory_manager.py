@@ -252,6 +252,16 @@ def add_product(inventory):
         print("\nChoose physical or digital.")
         return inventory
 
+    supplier_id = input("Supplier ID: ").strip()
+    supplier_name = input("Supplier Name: ").strip()
+    supplier_email = input("Supplier Contact Email: ").strip()
+
+    if not supplier_id or not supplier_name or not supplier_email:
+        print("\nSupplier ID, name, and contact email cannot be empty.")
+        return inventory
+
+    supplier = Supplier(supplier_id, supplier_name, supplier_email)
+
     try:
         if product_type == "physical":
             weight = float(input("Weight in kg: "))
@@ -259,7 +269,7 @@ def add_product(inventory):
                 raise ValueError("Weight cannot be negative.")
 
             new_product = PhysicalProduct(
-                product_id, product_name, product_price, product_stock, weight
+                product_id, product_name, product_price, product_stock, weight, supplier
             )
         else:
             download_size = float(input("Download size in MB: "))
@@ -267,7 +277,7 @@ def add_product(inventory):
                 raise ValueError("Download size cannot be negative.")
 
             new_product = DigitalProduct(
-                product_id, product_name, product_price, product_stock, download_size
+                product_id, product_name, product_price, product_stock, download_size, supplier
             )  
         inventory.add_product(new_product)
     except ValueError as error:
