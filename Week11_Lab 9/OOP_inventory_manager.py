@@ -166,6 +166,35 @@ class Inventory:
 
         return products_data   
 
+#Discount Strategy Classes
+class DiscountStrategy(ABC):
+    @abstractmethod
+    def apply_discount(self, total: float) -> float:
+        pass
+
+class FullPrice(DiscountStrategy):
+    def apply_discount(self, subtotal: float) -> float:
+        return subtotal
+
+class PercentageDiscount(DiscountStrategy):
+    def __init__(self, discount_percent: float) -> None:
+        self.discount_percent = discount_percent
+
+    def apply_discount(self, subtotal: float) -> float:
+        discount_amount = subtotal * self.discount_percent / 100
+        return subtotal - discount_amount
+
+class BulkDiscount(DiscountStrategy):
+    def __init__(self, minimum_subtotal: float, discount_amount: float) -> None:
+        self.minimum_subtotal = minimum_subtotal
+        self.discount_amount = discount_amount
+
+    def apply_discount(self, subtotal: float) -> float:
+        if subtotal >= self.minimum_subtotal:
+            return subtotal - self.discount_amount
+        return subtotal
+
+# Order Processing Classes
 class Order:
     def __init__(self, order_id: str) -> None:
         self.order_id = order_id
@@ -191,6 +220,7 @@ class OrderLine:
     def calculate_subtotal(self) -> float:
         return self.product.get_price() * self.quantity
 
+# Functions for saving and loading inventory
 def save_inventory(inventory):
     inventory_data = inventory.create_product_list()
 
@@ -236,8 +266,7 @@ def load_inventory():
     print("Inventory loaded successfully.")
     return inventory
 
-##################
-
+# User Interaction Functions
 def add_product(inventory):
     print("\nAdd New Product")
     product_id = input("Product ID: ").strip()
@@ -298,7 +327,6 @@ def add_product(inventory):
 
     print("\nProduct added successfully!")
     return inventory
-
 
 def update_stock(inventory):
     print("\nUpdate Stock")
