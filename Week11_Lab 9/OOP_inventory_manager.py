@@ -24,6 +24,8 @@ class Product(ABC):
     ) -> None:
         self.__product_id = product_id
         self.__name = name
+        if price <= 0:
+            raise ValueError("Price must be greater than zero.")        
         self.__price = price
         self.set_stock(stock)
         self.supplier: Supplier = supplier
@@ -254,7 +256,10 @@ class Order:
 class OrderLine:
     def __init__(self, product: Product, quantity: int) -> None:
         self.product = product
+        if quantity <= 0:
+            raise ValueError("Order quantity must be greater than zero.")     
         self.quantity = quantity
+   
 
     def calculate_subtotal(self) -> float:
         return self.product.get_price() * self.quantity
@@ -293,12 +298,13 @@ def load_inventory():
             supplier_data["contact_email"],
         )
 
-        if product_type == "physical":
-            product = PhysicalProduct(*common_args, product_data["weight"], supplier)
-        elif product_type == "digital":
-            product = DigitalProduct(*common_args, product_data["download_size"], supplier)
-        else:
-            raise ValueError(f"Missing or unsupported product type: {product_type!r}")
+        product = ProductFactory.create(
+            product_type,
+            *common_args,
+            supplier,
+            weight=product_data.get("weight"),
+            download_size=product_data.get("download_size"),
+        )
 
         inventory.add_product(product)
 
