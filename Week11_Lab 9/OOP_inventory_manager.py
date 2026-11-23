@@ -348,17 +348,21 @@ def add_product(inventory):
             if weight < 0:
                 raise ValueError("Weight cannot be negative.")
 
-            new_product = PhysicalProduct(
-                product_id, product_name, product_price, product_stock, weight, supplier
+            new_product = ProductFactory.create(
+                product_type, product_id, product_name,
+                product_price, product_stock, supplier,
+                weight=weight,
             )
         else:
             download_size = float(input("Download size in MB: "))
             if download_size < 0:
                 raise ValueError("Download size cannot be negative.")
 
-            new_product = DigitalProduct(
-                product_id, product_name, product_price, product_stock, download_size, supplier
-            )  
+            new_product = ProductFactory.create(
+                product_type, product_id, product_name,
+                product_price, product_stock, supplier,
+                download_size=download_size,
+            )
         inventory.add_product(new_product)
     except ValueError as error:
         print(f"\n{error}")
