@@ -117,6 +117,32 @@ class DigitalProduct(Product):
         product_dict["download_size"] = self.__download_size
         return product_dict
 
+class ProductFactory:
+    @staticmethod
+    def create(
+        product_type: str,
+        product_id: str,
+        name: str,
+        price: float,
+        stock: int,
+        supplier: Supplier,
+        *,
+        weight: float | None = None,
+        download_size: float | None = None,
+    ) -> Product:
+        if product_type == "physical":
+            if weight is None:
+                raise ValueError("Physical products require a weight.")
+            
+            return PhysicalProduct(product_id, name, price, stock, weight, supplier)
+        elif product_type == "digital":
+            if download_size is None:
+                raise ValueError("Digital products require a download size.")
+            
+            return DigitalProduct(product_id, name, price, stock, download_size, supplier)
+        else:
+            raise ValueError(f"Unknown product type: {product_type}")
+
 class Inventory:
     def __init__(self):
         self.__products: list[Product] = []
@@ -193,6 +219,16 @@ class BulkDiscount(DiscountStrategy):
         if subtotal >= self.minimum_subtotal:
             return subtotal - self.discount_amount
         return subtotal
+
+class CappedPercentageDiscount(DiscountStrategy):
+    def __init__(self, discount_percent: float, max_discount: float) -> None:
+        self.discount_percent = discount_percent
+        self.max_discount = max_discount
+
+    def apply_discount(self, subtotal: float) -> float:
+        discount_amount = min(subtotal * self.discount_percent / 100, self.max_discount)
+        
+        return subtotal - discount_amount
 
 # Order Processing Classes
 class Order:
