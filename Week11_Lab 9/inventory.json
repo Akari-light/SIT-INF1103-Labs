@@ -1,0 +1,41 @@
+[
+    {
+        "id": "P001",
+        "name": "Desk Lamp",
+        "price": 25.0,
+        "stock": 10,
+        "supplier": {
+            "id": "S001",
+            "name": "Tech Supply",
+            "contact_email": "sales@example.com"
+        },
+        "type": "physical",
+        "weight": 1.2
+    },
+    {
+        "id": "D001",
+        "name": "Photo Editor",
+        "price": 49.9,
+        "stock": 100,
+        "supplier": {
+            "id": "S001",
+            "name": "Tech Supply",
+            "contact_email": "sales@example.com"
+        },
+        "type": "digital",
+        "download_size": 350.0
+    },
+    {
+        "id": "P003",
+        "name": "Monitor Stand",
+        "price": 39.5,
+        "stock": 7,
+        "supplier": {
+            "id": "S001",
+            "name": "Tech Supply",
+            "contact_email": "sales@example.com"
+        },
+        "type": "physical",
+        "weight": 2.5
+    }
+]
