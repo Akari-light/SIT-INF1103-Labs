@@ -312,6 +312,20 @@ def load_inventory():
     return inventory
 
 # User Interaction Functions
+def get_positive_float(prompt: str) -> float:
+    while True:
+        try:
+            price = float(input(prompt))
+        except ValueError:
+            print("Please enter a valid number, e.g. 12.50")
+            continue
+
+        if price <= 0:
+            print("Please enter a number greater than zero.")
+            continue
+
+        return price
+
 def add_product(inventory):
     print("\nAdd New Product")
     product_id = input("Product ID: ").strip()
@@ -321,15 +335,16 @@ def add_product(inventory):
         print("\nProduct ID and name cannot be empty.")
         return inventory
 
+    product_price = get_positive_float("Price: ")
+
     try:
-        product_price = float(input("Price: "))
         product_stock = int(input("Stock Quantity: "))
     except ValueError:
         print("\nEnter a numeric price and a whole number for stock.")
         return inventory
     
-    if product_price < 0 or product_stock < 0:
-        print("\nPrice and stock cannot be negative.")
+    if product_stock < 0:
+        print("\nStock cannot be negative.")
         return inventory
 
     product_type = input("Product type (physical/digital): ").strip().lower()
