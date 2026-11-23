@@ -166,13 +166,13 @@ class Inventory:
 
         return products_data   
 
-#Discount Strategy Classes
+#Discount Strategies Classes
 class DiscountStrategy(ABC):
     @abstractmethod
     def apply_discount(self, total: float) -> float:
         pass
 
-class FullPrice(DiscountStrategy):
+class NoDiscount(DiscountStrategy):
     def apply_discount(self, subtotal: float) -> float:
         return subtotal
 
@@ -196,21 +196,24 @@ class BulkDiscount(DiscountStrategy):
 
 # Order Processing Classes
 class Order:
-    def __init__(self, order_id: str) -> None:
+    def __init__(self, order_id: str, discount_strategy: DiscountStrategy | None = None) -> None:
         self.order_id = order_id
         self.order_lines: list[OrderLine] = []
+        self.discount_strategy = (NoDiscount() if discount_strategy is None else discount_strategy)
+
+    def set_discount(self, discount_strategy: DiscountStrategy) -> None:
+        self.discount_strategy = discount_strategy
 
     def add_order_line(self, product: Product, quantity: int) -> None:
         order_line = OrderLine(product, quantity)
         self.order_lines.append(order_line)
 
     def calculate_total(self) -> float:
-        total = 0.0
-
+        subtotal = 0.0 #sum before the discount is applied
         for line in self.order_lines:
-            total += line.calculate_subtotal()
+            subtotal += line.calculate_subtotal()
 
-        return total
+        return self.discount_strategy.apply_discount(subtotal)
 
 class OrderLine:
     def __init__(self, product: Product, quantity: int) -> None:
