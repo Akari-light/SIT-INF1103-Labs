@@ -1,8 +1,11 @@
+import csv
 import json
-from pathlib import Path
 from abc import ABC, abstractmethod
+from math import isfinite
+from pathlib import Path
 
 INVENTORY_FILE = Path(__file__).resolve().parent / "inventory.json"
+PRODUCTS_FILE = INVENTORY_FILE.with_name("products.csv")
 
 class Supplier:
     def __init__(self, supplier_id: str, name: str, contact_email: str) -> None:
@@ -22,10 +25,11 @@ class Product(ABC):
         self, product_id: str, name: str, price: float, stock: int,
         supplier: Supplier
     ) -> None:
+        if not isfinite(price) or price <= 0:
+            raise ValueError("Price must be greater than zero.")
+
         self.__product_id = product_id
         self.__name = name
-        if price <= 0:
-            raise ValueError("Price must be greater than zero.")        
         self.__price = price
         self.set_stock(stock)
         self.supplier: Supplier = supplier
@@ -64,8 +68,8 @@ class Product(ABC):
                 "id": self.supplier.supplier_id,
                 "name": self.supplier.name,
                 "contact_email": self.supplier.contact_email,
-            },            
-        }    
+            },
+        }
 
 class CanBeShipped(ABC):
     @abstractmethod
@@ -78,16 +82,19 @@ class PhysicalProduct(Product):
         self, product_id: str, name: str, price: float, stock: int,
         weight: float, supplier: Supplier
     ) -> None:
+        if not isfinite(weight) or weight < 0:
+            raise ValueError("Weight must be finite and nonnegative.")
+
         super().__init__(product_id, name, price, stock, supplier)
         self.__weight = weight
-        
-    
+
+
     def get_fulfilment_info(self) -> str:
         return "This product requires physical shipping."
 
     def calculate_shipping_cost(self) -> float:
         return 5.00 + 2.00 * self.__weight
-    
+
     def display_information(self) -> None:
         super().display_information()
         print(f"Weight: {self.__weight} kg")
@@ -103,6 +110,9 @@ class DigitalProduct(Product):
         self, product_id: str, name: str, price: float, stock: int,
         download_size: float, supplier: Supplier
     ) -> None:
+        if not isfinite(download_size) or download_size < 0:
+            raise ValueError("Download size must be finite and nonnegative.")
+
         super().__init__(product_id, name, price, stock, supplier)
         self.__download_size = download_size
 
@@ -135,18 +145,18 @@ class ProductFactory:
         if product_type == "physical":
             if weight is None:
                 raise ValueError("Physical products require a weight.")
-            
+
             return PhysicalProduct(product_id, name, price, stock, weight, supplier)
         elif product_type == "digital":
             if download_size is None:
                 raise ValueError("Digital products require a download size.")
-            
+
             return DigitalProduct(product_id, name, price, stock, download_size, supplier)
         else:
             raise ValueError(f"Unknown product type: {product_type}")
 
 class Inventory:
-    def __init__(self):
+    def __init__(self) -> None:
         self.__products: list[Product] = []
 
     def display_all(self) -> None:
@@ -175,7 +185,7 @@ class Inventory:
         if self.search_product(product_id) is not None:
             raise ValueError("Product ID already exists.")
 
-        self.__products.append(product)    
+        self.__products.append(product)
 
     def remove_product(self, product_id: str) -> Product | None:
         product = self.search_product(product_id)
@@ -192,12 +202,12 @@ class Inventory:
         for product in self.__products:
             products_data.append(product.create_product_dict())
 
-        return products_data   
+        return products_data
 
-#Discount Strategies Classes
+# Discount strategies
 class DiscountStrategy(ABC):
     @abstractmethod
-    def apply_discount(self, total: float) -> float:
+    def apply_discount(self, subtotal: float) -> float:
         pass
 
 class NoDiscount(DiscountStrategy):
@@ -229,7 +239,7 @@ class CappedPercentageDiscount(DiscountStrategy):
 
     def apply_discount(self, subtotal: float) -> float:
         discount_amount = min(subtotal * self.discount_percent / 100, self.max_discount)
-        
+
         return subtotal - discount_amount
 
 # Order Processing Classes
@@ -247,7 +257,7 @@ class Order:
         self.order_lines.append(order_line)
 
     def calculate_total(self) -> float:
-        subtotal = 0.0 #sum before the discount is applied
+        subtotal = 0.0
         for line in self.order_lines:
             subtotal += line.calculate_subtotal()
 
@@ -255,23 +265,24 @@ class Order:
 
 class OrderLine:
     def __init__(self, product: Product, quantity: int) -> None:
-        self.product = product
         if quantity <= 0:
-            raise ValueError("Order quantity must be greater than zero.")     
+            raise ValueError("Order quantity must be greater than zero.")
+
+        self.product = product
         self.quantity = quantity
-   
+
 
     def calculate_subtotal(self) -> float:
         return self.product.get_price() * self.quantity
 
 # Functions for saving and loading inventory
-def save_inventory(inventory):
+def save_inventory(inventory: Inventory) -> None:
     inventory_data = inventory.create_product_list()
 
     with INVENTORY_FILE.open("w", encoding="utf-8") as file:
         json.dump(inventory_data, file, indent=4)
 
-def load_inventory():
+def load_inventory() -> Inventory:
     inventory = Inventory()
 
     if not INVENTORY_FILE.exists():
@@ -311,6 +322,41 @@ def load_inventory():
     print("Inventory loaded successfully.")
     return inventory
 
+def load_products(path: str | Path, inventory: Inventory, supplier: Supplier) -> None:
+    try:
+        file = open(path, encoding="utf-8", newline="")
+    except FileNotFoundError:
+        print(f"Products file not found: {path}")
+    else:
+        loaded = 0
+        with file:
+            rows = csv.reader(file)
+            next(rows, None)  # Skip the header.
+
+            for row_number, row in enumerate(rows, start=2):
+                try:
+                    product_type, product_id, name, price, stock, weight, download_size = row
+
+                    product = ProductFactory.create(
+                        product_type,
+                        product_id,
+                        name,
+                        float(price),
+                        int(stock),
+                        supplier,
+                        weight=float(weight) if weight else None,
+                        download_size=float(download_size) if download_size else None,
+                    )
+                    inventory.add_product(product)
+                except ValueError as error:
+                    print(f"Skipped row {row_number}: {error}")
+                else:
+                    loaded += 1
+
+        print(f"{loaded} products loaded.")
+    finally:
+        print("Load attempt finished.")
+
 # User Interaction Functions
 def get_positive_float(prompt: str) -> float:
     while True:
@@ -320,79 +366,80 @@ def get_positive_float(prompt: str) -> float:
             print("Please enter a valid number, e.g. 12.50")
             continue
 
+        if not isfinite(price):
+            print("Please enter a finite number.")
+            continue
+
         if price <= 0:
             print("Please enter a number greater than zero.")
             continue
 
         return price
 
-def add_product(inventory):
-    print("\nAdd New Product")
-    product_id = input("Product ID: ").strip()
-    product_name = input("Product Name: ").strip()
-
-    if not product_id or not product_name:
-        print("\nProduct ID and name cannot be empty.")
-        return inventory
-
-    product_price = get_positive_float("Price: ")
-
-    try:
-        product_stock = int(input("Stock Quantity: "))
-    except ValueError:
-        print("\nEnter a numeric price and a whole number for stock.")
-        return inventory
-    
-    if product_stock < 0:
-        print("\nStock cannot be negative.")
-        return inventory
-
-    product_type = input("Product type (physical/digital): ").strip().lower()
-
-    if product_type not in ("physical", "digital"):
-        print("\nChoose physical or digital.")
-        return inventory
-
+def prompt_supplier() -> Supplier | None:
     supplier_id = input("Supplier ID: ").strip()
     supplier_name = input("Supplier Name: ").strip()
     supplier_email = input("Supplier Contact Email: ").strip()
 
     if not supplier_id or not supplier_name or not supplier_email:
         print("\nSupplier ID, name, and contact email cannot be empty.")
-        return inventory
+        return None
 
-    supplier = Supplier(supplier_id, supplier_name, supplier_email)
+    return Supplier(supplier_id, supplier_name, supplier_email)
+
+
+def add_product(inventory: Inventory) -> None:
+    print("\nAdd New Product")
+    product_id = input("Product ID: ").strip()
+    product_name = input("Product Name: ").strip()
+
+    if not product_id or not product_name:
+        print("\nProduct ID and name cannot be empty.")
+        return
+
+    product_price = get_positive_float("Price: ")
 
     try:
+        product_stock = int(input("Stock Quantity: "))
+    except ValueError:
+        print("\nStock must be a whole number.")
+        return
+
+    if product_stock < 0:
+        print("\nStock cannot be negative.")
+        return
+
+    product_type = input("Product type (physical/digital): ").strip().lower()
+
+    if product_type not in ("physical", "digital"):
+        print("\nChoose physical or digital.")
+        return
+
+    supplier = prompt_supplier()
+    if supplier is None:
+        return
+
+    try:
+        weight = None
+        download_size = None
         if product_type == "physical":
             weight = float(input("Weight in kg: "))
-            if weight < 0:
-                raise ValueError("Weight cannot be negative.")
-
-            new_product = ProductFactory.create(
-                product_type, product_id, product_name,
-                product_price, product_stock, supplier,
-                weight=weight,
-            )
         else:
             download_size = float(input("Download size in MB: "))
-            if download_size < 0:
-                raise ValueError("Download size cannot be negative.")
-
-            new_product = ProductFactory.create(
-                product_type, product_id, product_name,
-                product_price, product_stock, supplier,
-                download_size=download_size,
-            )
+        new_product = ProductFactory.create(
+            product_type, product_id, product_name,
+            product_price, product_stock, supplier,
+            weight=weight,
+            download_size=download_size,
+        )
         inventory.add_product(new_product)
     except ValueError as error:
         print(f"\n{error}")
-        return inventory
+        return
 
     print("\nProduct added successfully!")
-    return inventory
 
-def update_stock(inventory):
+def update_stock(inventory: Inventory) -> None:
     print("\nUpdate Stock")
     product_id = input("Enter Product ID: ").strip()
 
@@ -420,7 +467,7 @@ def update_stock(inventory):
     print("\nStock updated successfully!")
 
 
-def main():
+def main() -> None:
     print("=" * 40)
     print("INVENTORY MANAGEMENT SYSTEM")
     print("=" * 40)
@@ -435,6 +482,7 @@ def main():
     print("4. Search Product")
     print("5. Save Inventory")
     print("6. Exit")
+    print("7. Import Products from CSV")
     print("----------------------------")
 
     while True:
@@ -474,8 +522,14 @@ def main():
             print("Program terminated.")
             break
 
+        elif choice == "7":
+            print("\nImporting products.csv. Enter the supplier for this import.")
+            supplier = prompt_supplier()
+            if supplier is not None:
+                load_products(PRODUCTS_FILE, inventory, supplier)
+
         else:
-            print("\nInvalid option. Please choose 1 to 6.")
+            print("\nInvalid option. Please choose 1 to 7.")
 
 
 if __name__ == "__main__":
